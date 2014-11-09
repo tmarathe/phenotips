@@ -344,46 +344,22 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
         if (person.isFetus()) {
             var date = person.getGestationAge();
             text = (date) ? date + " weeks" : null;
+            return;
         }
-        else if(person.getLifeStatus() == 'alive') {
+        if(person.getLifeStatus() == 'alive') {
             if (person.getBirthDate()) {
-                if (person.getBirthDate().onlyDecadeAvailable()) {
-                    text = "b. " + person.getBirthDate().getDecade();
-                } else {
-                    var age = getAge(person.getBirthDate(), null);
-                    if (person.getBirthDate().getMonth() == null) {
-                        text = "b. " + person.getBirthDate().getYear();                         // b. 1972
-                    } else {
-                        if (person.getBirthDate().getDay() == null) {
-                            text = "b. " + person.getBirthDate().getMonthName() + " " +         // b. Jan 1972
-                            person.getBirthDate().getYear();
-                        } else {
-                            text = "b. " + person.getBirthDate().getMonthName() + " " +
-                            person.getBirthDate().getDay() + ", " +
-                            person.getBirthDate().getYear();                                    // b. Jan 13, 1972
-                            if (age.indexOf("day") != -1 || age.indexOf("wk") != -1) {
-                                text += " (" + age + ")";                                       // b. Jan 13, 1972 (5 days)
-                            }
-                        }
-                    }
-                }
+                text = "b. " + person.getBirthDate().getBestPrecisionStringDDMMYYY();
             }
         }
         else {
             if(person.getDeathDate() && person.getBirthDate()) {
-                var age = getAge(person.getBirthDate(), person.getDeathDate());
-                if (person.getDeathDate().getYear() != null && person.getDeathDate().getMonth() != null &&
-                    (age.indexOf("day") != -1 || age.indexOf("wk") != -1 || age.indexOf("mo") != -1) ) {
-                    text = "d. " + person.getDeathDate().getYear(true) + " (" + age + ")";
-                } else {
-                    text = person.getBirthDate().getBestPrecisionStringYear() + " – " + person.getDeathDate().getBestPrecisionStringYear();
-                }
+                text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
             }
             else if (person.getDeathDate()) {
-                text = "d. " + person.getDeathDate().getBestPrecisionStringYear();
+                text = "d. " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
             }
             else if(person.getBirthDate()) {
-                text = person.getBirthDate().getBestPrecisionStringYear() + " – ?";
+                text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – ?";
             }
         }
         this.getAgeLabel() && this.getAgeLabel().remove();

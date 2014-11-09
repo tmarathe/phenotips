@@ -147,6 +147,19 @@ var PedigreeDate = Class.create({
         return this.year.toString();
     },
 
+    getBestPrecisionStringDDMMYYY: function() {
+        if (!this.isSet()) return "";
+        if (this.year == null) return this.decade;
+        var dateStr = this.getYear().toString();
+        if (this.getMonth() != null) {
+            dateStr = ("0" + this.getMonth()).slice(-2) + "-" + dateStr;
+            if (this.getDay() != null) {
+                dateStr = ("0" + this.getDay()).slice(-2) + "-" + dateStr;
+            }
+        }
+        return dateStr;
+    },
+
     // Returns the number of milliseconds since 1 January 1970 (same as Date.getTime()) 
     getTime: function() {
         return this.toJSDate().getTime();
