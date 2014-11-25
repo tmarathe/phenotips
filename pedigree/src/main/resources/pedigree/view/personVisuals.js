@@ -346,19 +346,21 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
             text = (date) ? date + " weeks" : null;
             return;
         }
+        var birthDate = person.getBirthDate();
+        var deathDate = person.getDeathDate();
         if(person.getLifeStatus() == 'alive') {
-            if (person.getBirthDate()) {
+            if (birthDate && birthDate.isComplete()) {
                 text = "b. " + person.getBirthDate().getBestPrecisionStringDDMMYYY();
             }
         }
         else {
-            if(person.getDeathDate() && person.getBirthDate()) {
+            if(deathDate && birthDate && deathDate.isComplete() && birthDate.isComplete()) {
                 text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
             }
-            else if (person.getDeathDate()) {
+            else if (deathDate && deathDate.isComplete()) {
                 text = "d. " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
             }
-            else if(person.getBirthDate()) {
+            else if(birthDate && birthDate.isComplete()) {
                 text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – ?";
             }
         }

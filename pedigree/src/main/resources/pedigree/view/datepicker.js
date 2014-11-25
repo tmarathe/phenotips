@@ -2,6 +2,8 @@ var PhenoTips = (function (PhenoTips) {
   var widgets = PhenoTips.widgets = PhenoTips.widgets || {};
 
   widgets.FuzzyDatePickerDropdown = Class.create({
+    alwaysEnabled: true,
+
     initialize : function(options) {
       this.dropdown = new Element('select', {
         "name"        : options.name     || '',
@@ -9,6 +11,7 @@ var PhenoTips = (function (PhenoTips) {
         "placeholder" : options.hint     || options.name || '',
         "title"       : options.hint     || options.name || ''
       });
+      this.alwaysEnabled = options.alwaysEnabled ? options.alwaysEnabled : this.alwaysEnabled;
     },
 
     populate : function(values) {
@@ -39,9 +42,11 @@ var PhenoTips = (function (PhenoTips) {
     },
 
     disable : function () {
-      this.dropdown.disable();
-      this._tmpSelectedIndex = this.dropdown.selectedIndex;
-      this.dropdown.selectedIndex = 0;
+      if (!this.alwaysEnabled) {
+        this.dropdown.disable();
+        this._tmpSelectedIndex = this.dropdown.selectedIndex;
+        this.dropdown.selectedIndex = 0;
+      }
     },
 
     getElement : function() {
@@ -55,7 +60,10 @@ var PhenoTips = (function (PhenoTips) {
       events.each(function(eventName) {
         _this.dropdown.observe(eventName, function() {
           callback();
+          /* Due to the datepicker fields never being disabled, the _tmpSelectedIndex causes a bug.
+          Although there should be a more appropriate solution, it was decided to just comment out the following line.
           _this._tmpSelectedIndex = _this.dropdown.selectedIndex;
+           */
         });
       });
     },
@@ -79,6 +87,10 @@ var PhenoTips = (function (PhenoTips) {
 
     getSelectedOption : function () {
        return (this.dropdown.selectedIndex >= 0) ? this.dropdown.options[this.dropdown.selectedIndex].innerHTML : '';
+    },
+
+    isAlwaysEnabled: function () {
+      return this.alwaysEnabled;
     }
   });
 
@@ -87,13 +99,13 @@ var PhenoTips = (function (PhenoTips) {
       if (!input) {return};
       this.__input = input;
       this.__input.hide();
-      
+
       this.container = new Element('div', {'class' : 'fuzzy-date-picker'});
-      this.__input.insert({after : this.container});      
-      this.container.insert(this.createYearDropdown());
-      this.container.insert(this.createMonthDropdown());
+      this.__input.insert({after : this.container});
       this.container.insert(this.createDayDropdown());
-      
+      this.container.insert(this.createMonthDropdown());
+      this.container.insert(this.createYearDropdown());
+
       // TODO: yearSelector's (and month's & day's) .onSelect() does not seem to fire
       //       upon programmatic update if a substitute is found can remove these hackish events
       this.container.observe("datepicker:date:changed", this.onProgrammaticUpdate.bind(this));
@@ -209,16 +221,19 @@ var PhenoTips = (function (PhenoTips) {
             }
         }
 
-        if (y > 0) {
-            var m = this.monthSelector.getSelectedValue();
+        var m = 0;
+        if (y > 0 || this.monthSelector.isAlwaysEnabled()) {
+            m = this.monthSelector.getSelectedValue();
             if (m > 0) {
                 dateObject["month"] = this.monthSelector.getSelectedOption();
-
-                var d = this.daySelector.getSelectedValue();
-                if (d > 0) {
-                    dateObject["day"] = this.daySelector.getSelectedOption();
-                }
             }
+        }
+
+        if (m > 0 || this.daySelector.isAlwaysEnabled()) {
+          var d = this.daySelector.getSelectedValue();
+          if (d > 0) {
+            dateObject["day"] = this.daySelector.getSelectedOption();
+          }
         }
 
         var newValue = JSON.stringify(dateObject);

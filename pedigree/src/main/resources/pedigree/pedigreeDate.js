@@ -105,12 +105,18 @@ var PedigreeDate = Class.create({
         return this.toString();
     },
 
+    /** Returns true if any part of the date has been set. */
     isSet: function() {
+        return (this.decade !== null || this.year !== null || this.month !== null || this.day !== null);
+    },
+
+    /** Returns true iff the minimum precision level is set, ie. the decade. Useful for displaying the date. */
+    isComplete: function() {
         return (this.decade !== null);
     },
 
     onlyDecadeAvailable: function() {
-        return (this.decade !== null && this.year == null);
+        return (this.decade !== null && this.year === null && this.month === null && this.day === null);
     },
 
     // Returns a string or null
@@ -143,12 +149,14 @@ var PedigreeDate = Class.create({
     // Returns either a decade or the year (both as string)
     getBestPrecisionStringYear: function() {
         if (!this.isSet()) return "";
-        if (this.year == null) return this.decade;
+        if (this.year == null) {
+            return this.decade || "";
+        }
         return this.year.toString();
     },
 
     getBestPrecisionStringDDMMYYY: function() {
-        if (!this.isSet()) return "";
+        if (!this.isComplete()) return "";
         if (this.year == null) return this.decade;
         var dateStr = this.getYear().toString();
         if (this.getMonth() != null) {
@@ -168,7 +176,7 @@ var PedigreeDate = Class.create({
     // Returns an integer or null.
     // Iff "failsafe" returns first year of the decade if year is not set and decade is
     getYear: function(failsafe) {
-        if (this.isSet() && this.year == null && failsafe) {
+        if (this.isComplete() && this.year == null && failsafe) {
             // remove trailing "s" from the decade && convert to integer
             var year = parseInt( this.decade.slice(0,-1) );
             return year;
@@ -195,10 +203,10 @@ var PedigreeDate = Class.create({
     },
 
     canBeAfterDate: function(otherPedigreeDate) {
-        if (!this.isSet()) {
+        if (!this.isComplete()) {
             return true;
         }
-        if (!otherPedigreeDate.isSet()) {
+        if (!otherPedigreeDate.isComplete()) {
             return true;
         }
         if (this.getTime() > otherPedigreeDate.getTime()) {

@@ -769,13 +769,13 @@ NodeMenu = Class.create({
             } else {
                 if (value.year) {
                     year = value.year.toString();
-                    if (value.month) {
-                        month = value.month.toString();
-                        if (value.day) {
-                            day = value.day.toString();
-                        }
-                    }
                 }
+            }
+            if (value.month) {
+                month = value.month.toString();
+            }
+            if (value.day) {
+                day = value.day.toString();
             }
 
             var updated = false;
