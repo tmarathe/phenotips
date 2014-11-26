@@ -339,6 +339,7 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
      * @method updateAgeLabel
      */
     updateAgeLabel: function() {
+        this._ageLabel && this._ageLabel.remove();
         var text,
             person = this.getNode();
         if (person.isFetus()) {
@@ -351,11 +352,19 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
         if(person.getLifeStatus() == 'alive') {
             if (birthDate && birthDate.isComplete()) {
                 text = "b. " + person.getBirthDate().getBestPrecisionStringDDMMYYY();
+                if (person.getBirthDate().getYear() !== null) {
+                    var age = getAge(person.getBirthDate());
+                    text += " (" + age + ")";
+                }
             }
         }
         else {
             if(deathDate && birthDate && deathDate.isComplete() && birthDate.isComplete()) {
                 text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
+                if (person.getBirthDate().getYear() !== null && person.getDeathDate().getYear() !== null) {
+                    var age = getAge(person.getBirthDate(), person.getDeathDate());
+                    text += "\n" + age;
+                }                
             }
             else if (deathDate && deathDate.isComplete()) {
                 text = "d. " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
@@ -364,8 +373,10 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
                 text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – ?";
             }
         }
-        this.getAgeLabel() && this.getAgeLabel().remove();
         this._ageLabel = text ? editor.getPaper().text(this.getX(), this.getY(), text).attr(PedigreeEditor.attributes.label) : null;
+        if (text && text.indexOf("\n") > 0) {
+            this._ageLabel.alignTop = true;
+        }
         this.drawLabels();
     },
 
