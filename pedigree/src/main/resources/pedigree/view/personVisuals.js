@@ -543,8 +543,10 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
      */
     updateCommentsLabel: function() {
         this.getCommentsLabel() && this.getCommentsLabel().remove();        
-        if (this.getNode().getComments() != "") {       
-            var text = this.getNode().getComments(); //.replace(/\n/g, '<br />');
+        if (this.getNode().getComments() != "") {
+            // note: raphael positions text which starts with a new line in a strange way
+            //       also, blank lines are ignored unless replaced with a space
+            var text = this.getNode().getComments().replace(/^\s+|\s+$/g,'').replace(/\n\n/gi,'\n \n');
             this._commentsLabel = editor.getPaper().text(this.getX(), this.getY(), text).attr(PedigreeEditor.attributes.commentLabel);
             this._commentsLabel.alignTop = true;
         } else {
@@ -632,7 +634,7 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
      * @return {Raphael.st}
      */
     getLabels: function() {
-        var labels = editor.getPaper().set();        
+        var labels = editor.getPaper().set();
         this.getSBLabel() && labels.push(this.getSBLabel());
         this.getNameLabel() && labels.push(this.getNameLabel());
         this.getAgeLabel() && labels.push(this.getAgeLabel());        
@@ -656,13 +658,18 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
                 
         var startY = this.getY() + lowerBound * 1.8 + selectionOffset + childlessOffset;
         for (var i = 0; i < labels.length; i++) {
-            var offset = (labels[i].alignTop) ? (getElementHalfHeight(labels[i]) - 7) : 0;
-            labels[i].attr("y", startY + offset);                      
+            var offset = (labels[i].alignTop) ? (getElementHalfHeight(labels[i]) - 3) : 0;
+            labels[i].transform(""); // clear all transofrms, using new real x
+            labels[i].attr("x", this.getX());
+            labels[i].attr("y", startY + offset);
             labels[i].oy = (labels[i].attr("y") - selectionOffset);
-            startY = labels[i].getBBox().y2 + 11;
+            labels[i].toBack();
+            if (i != labels.length - 1) {   // dont do getBBox() computation if dont need to, it is slow in IE9
+                startY = labels[i].getBBox().y2 + 11;
+            }
         }
-        if(!editor.isUnsupportedBrowser())
-            labels.flatten().insertBefore(this.getHoverBox().getFrontElements().flatten());
+        //if(!editor.isUnsupportedBrowser())
+        //    labels.flatten().insertBefore(this.getHoverBox().getFrontElements().flatten());
     },
     
     _labelSelectionOffset: function() {

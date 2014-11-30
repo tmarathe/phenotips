@@ -62,6 +62,11 @@ var ProbandDataLoader = Class.create( {
         this.probandData.firstName = unescapeRestData(getSubSelectorTextFromXML(responseXML, "property", "name", "first_name", "value"));
         this.probandData.lastName  = unescapeRestData(getSubSelectorTextFromXML(responseXML, "property", "name", "last_name", "value"));
         this.probandData.gender    = unescapeRestData(getSubSelectorTextFromXML(responseXML, "property", "name", "gender", "value"));
+        try {
+          this.probandData.birthDate = unescapeRestData(getSubSelectorTextFromXML(responseXML, "property", "name", "date_of_birth", "value"));
+          this.probandData.deathDate = unescapeRestData(getSubSelectorTextFromXML(responseXML, "property", "name", "date_of_death", "value"));
+        } catch (err) {
+        }
         if (this.probandData.gender === undefined || this.probandData.gender == '')
             this.probandData.gender = 'U';
         console.log("Proband data: " + stringifyObject(this.probandData));
@@ -76,12 +81,16 @@ var SaveLoadEngine = Class.create( {
     },
 
     /**
-     * Saves the state of the graph
+     * Saves the state of the pedigree (including any user preferences and current color scheme)
      *
      * @return Serialization data for the entire graph
      */
     serialize: function() {
-        return editor.getGraph().toJSON();
+        var jsonObject = editor.getGraph().toJSONObject();
+
+        jsonObject["settings"] = editor.getView().getSettings();
+
+        return JSON.stringify(jsonObject);
     },
 
     createGraphFromSerializedData: function(JSONString, noUndo, centerAround0) {
@@ -89,7 +98,15 @@ var SaveLoadEngine = Class.create( {
         document.fire("pedigree:load:start");
 
         try {
-            var changeSet = editor.getGraph().fromJSON(JSONString);
+            var jsonObject = JSON.parse(JSONString);
+
+            // load the graph model of the pedigree & node data
+            var changeSet = editor.getGraph().fromJSONObject(jsonObject);
+
+            // load/process metadata such as pedigree options and color choices
+            if (jsonObject.hasOwnProperty("settings")) {
+                editor.getView().loadSettings(jsonObject.settings);
+            }
         }
         catch(err)
         {
@@ -102,10 +119,11 @@ var SaveLoadEngine = Class.create( {
 
         if (!noUndo) {
             var probandData = editor.getProbandDataFromPhenotips();
-            var genderOk = editor.getGraph().setProbandData( probandData.firstName, probandData.lastName, probandData.gender );
+            var genderOk = editor.getGraph().setProbandData( probandData.firstName, probandData.lastName,
+                                                             probandData.gender, probandData.birthDate, probandData.deathDate );
             if (!genderOk)
                 alert("Proband gender defined in Phenotips is incompatible with this pedigree. Setting proband gender to 'Unknown'");
-            JSONString = editor.getGraph().toJSON();
+            JSONString = this.serialize();
         }
 
         if (editor.getView().applyChanges(changeSet, false)) {
@@ -141,7 +159,7 @@ var SaveLoadEngine = Class.create( {
             var genderOk = editor.getGraph().setProbandData( probandData.firstName, probandData.lastName, probandData.gender );
             if (!genderOk)
                 alert("Proband gender defined in Phenotips is incompatible with the imported pedigree. Setting proband gender to 'Unknown'");
-            JSONString = editor.getGraph().toJSON();
+            JSONString = this.serialize();
         }
 
         if (editor.getView().applyChanges(changeSet, false)) {
@@ -183,6 +201,8 @@ var SaveLoadEngine = Class.create( {
             },
             onComplete: function() {
                 me._saveInProgress = false;
+                var actionAfterSave = editor.getAfterSaveAction();
+                actionAfterSave && actionAfterSave();
             },
             onSuccess: function() { editor.getActionStack().addSaveEvent();
                                     savingNotification.replace(new XWiki.widgets.Notification("Successfuly saved"));
