@@ -342,6 +342,7 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
         this._ageLabel && this._ageLabel.remove();
         var text,
             person = this.getNode();
+        var multiLine = false;
         if (person.isFetus()) {
             var date = person.getGestationAge();
             text = (date) ? date + " weeks" : null;
@@ -363,8 +364,11 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
                 text = person.getBirthDate().getBestPrecisionStringDDMMYYY() + " – " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
                 if (person.getBirthDate().getYear() !== null && person.getDeathDate().getYear() !== null) {
                     var age = getAge(person.getBirthDate(), person.getDeathDate());
-                    text += "\n" + age;
-                }                
+                    if (age !== "") {
+                        text += "\n" + age;
+                        multiLine = true;
+                    }
+                }
             }
             else if (deathDate && deathDate.isComplete()) {
                 text = "d. " + person.getDeathDate().getBestPrecisionStringDDMMYYY();
@@ -374,7 +378,7 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
             }
         }
         this._ageLabel = text ? editor.getPaper().text(this.getX(), this.getY(), text).attr(PedigreeEditor.attributes.label) : null;
-        if (text && text.indexOf("\n") > 0) {
+        if (this._ageLabel && multiLine) {
             this._ageLabel.alignTop = true;
         }
         this.drawLabels();
@@ -549,6 +553,7 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
             var text = this.getNode().getComments().replace(/^\s+|\s+$/g,'').replace(/\n\n/gi,'\n \n');
             this._commentsLabel = editor.getPaper().text(this.getX(), this.getY(), text).attr(PedigreeEditor.attributes.commentLabel);
             this._commentsLabel.alignTop = true;
+            this._commentsLabel.addGap   = true;
         } else {
             this._commentsLabel = null;
         }
@@ -658,7 +663,8 @@ var PersonVisuals = Class.create(AbstractPersonVisuals, {
                 
         var startY = this.getY() + lowerBound * 1.8 + selectionOffset + childlessOffset;
         for (var i = 0; i < labels.length; i++) {
-            var offset = (labels[i].alignTop) ? (getElementHalfHeight(labels[i]) - 3) : 0;
+            var shift = (labels[i].addGap && i != 0) ? 4 : 8;   // make a small gap between comments and other fields
+            var offset = (labels[i].alignTop) ? (getElementHalfHeight(labels[i]) - shift) : 0;
             labels[i].transform(""); // clear all transofrms, using new real x
             labels[i].attr("x", this.getX());
             labels[i].attr("y", startY + offset);

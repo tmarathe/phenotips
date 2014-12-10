@@ -1,0 +1,3 @@
+org.phenotips.diagnosis.script.DiagnosisScriptService
+org.phenotips.diagnosis.internal.DefaultDiagnosisService
+org.phenotips.diagnosis.internal.BoqaInitializer

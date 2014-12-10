@@ -548,6 +548,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>ontology-chebi-access-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ontology-omim-access-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -694,6 +699,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>storage-migrators-attachments-filesystem</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>diagnosis-suggestion-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

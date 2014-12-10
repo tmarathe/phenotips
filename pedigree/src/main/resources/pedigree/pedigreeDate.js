@@ -115,6 +115,10 @@ var PedigreeDate = Class.create({
         return (this.decade !== null);
     },
 
+    isComplete: function() {
+        return (this.decade !== null);
+    },
+
     onlyDecadeAvailable: function() {
         return (this.decade !== null && this.year === null && this.month === null && this.day === null);
     },
