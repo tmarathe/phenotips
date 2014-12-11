@@ -145,9 +145,7 @@ var PhenoTips = (function (PhenoTips) {
 
     yearSelected : function() {
       if (this.yearSelector.getSelectedValue() > 0) {
-        if (this.monthSelector.enable()) {
-            this.monthSelected();
-        }
+        this.monthSelector.enable();
       } else {
         this.monthSelector.disable();
         this.daySelector.disable();
