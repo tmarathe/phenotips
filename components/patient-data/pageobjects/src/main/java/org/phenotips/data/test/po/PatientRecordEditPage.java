@@ -793,7 +793,7 @@ public class PatientRecordEditPage extends InlinePage
      * Sets APGAR scores from the one and five minute options
      *
      * @param oneMinute a string that this one of the numbers "1" to "10" or "Unknown" for the one minute APGAR
-     * @param fiveMinute a string that this one of the numbers "1" to "10" or "Unknown" for the five minute APGAR
+     * @param fiveMinutes a string that this one of the numbers "1" to "10" or "Unknown" for the five minute APGAR
      */
     public void setAPGARScores(String oneMinute, String fiveMinutes)
     {
