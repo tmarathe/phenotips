@@ -706,7 +706,7 @@ $xwiki.jsx.use('PhenoTips.UIX_Field__phenotype')##
     &lt;fieldset&gt;
       &lt;table&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="icon"&gt;&lt;label for="quick-phenotype-search"&gt;&lt;span class="fa fa-search fa-3x"&gt; &lt;/span&gt;&lt;/label&gt;&lt;/td&gt;
       &lt;td&gt;&lt;label for="quick-phenotype-search"&gt;$services.localization.render('phenotips.UIXField.phenotype.quickSearch')&lt;/label&gt;
-      &lt;input type='text' name='$!{fieldName}' class='suggested multi suggest-hpo quickSearch withTip generateYesNo' placeholder="$services.localization.render('phenotips.UIXField.phenotype.quickSearch.placeholder')" size='16' id='quick-phenotype-search'/&gt;&lt;/td&gt;
+      &lt;input type='text' name='$!{fieldName}' class='suggested multi suggest-hpo quickSearch withTip generateYesNo accept-value' placeholder="$services.localization.render('phenotips.UIXField.phenotype.quickSearch.placeholder')" size='16' id='quick-phenotype-search'/&gt;&lt;/td&gt;
       &lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
     &lt;/fieldset&gt;
     {{/html}}

@@ -77,6 +77,7 @@ public class FormSection extends FormGroup
         }
 
         String displayOther = "";
+        // Hides the Other section
         if ("phenotype".equals(this.propertyName)){
             displayOther = "display:none";
         }
